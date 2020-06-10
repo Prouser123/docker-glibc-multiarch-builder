@@ -48,7 +48,7 @@ jobs:
           draft: false
           prerelease: false
       # Artifact Upload #1 - x86_64
-      - 
+      -
         name: Upload Artifact: x86_64
         uses: actions/upload-release-asset@v1
         env:
@@ -59,7 +59,7 @@ jobs:
           asset_name: glibc-bin-$GLIBC_VERSION-$REVISION-x86_64.tar.gz
           asset_content_type: application/gzip
       # Artifact Upload #2 - aarch64
-      - 
+      -
         name: Upload Artifact: aarch64
         uses: actions/upload-release-asset@v1
         env:
@@ -70,7 +70,7 @@ jobs:
           asset_name: glibc-bin-$GLIBC_VERSION-$REVISION-aarch64.tar.gz
           asset_content_type: application/gzip
       # Artifact Upload #3 - arm
-      - 
+      -
         name: Upload Artifact: arm
         uses: actions/upload-release-asset@v1
         env:
@@ -81,7 +81,7 @@ jobs:
           asset_name: glibc-bin-$GLIBC_VERSION-$REVISION-arm.tar.gz
           asset_content_type: application/gzip
       # Artifact Upload #4 - armhf
-      - 
+      -
         name: Upload Artifact: armhf
         uses: actions/upload-release-asset@v1
         env:
