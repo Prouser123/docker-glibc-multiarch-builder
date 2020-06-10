@@ -1,4 +1,4 @@
-FROM ubuntu:19.04
+FROM ubuntu:20.04
 MAINTAINER Sasha Gerrand <github+docker-glibc-builder@sgerrand.com>
 
 ENV PREFIX_DIR /usr/glibc-compat
@@ -16,7 +16,7 @@ RUN apt-get -q update \
 		texinfo \
 		wget \
 		gcc-aarch64-linux-gnu \
-		gcc-arm-linux-gnu
+		gcc-arm-linux-gnueabi
 COPY configparams /glibc-build/configparams
 COPY builder /builder
 ENTRYPOINT ["/builder"]
