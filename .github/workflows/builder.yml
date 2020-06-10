@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GLIBC_VERSION: 2.31
-      REVISION: 0
+      REVISION: 1
     steps:
       -
         name: Checkout
@@ -39,8 +39,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: jcx-$GLIBC_VERSION-$REVISION
-          release_name: jcx-$GLIBC_VERSION-$REVISION
+          tag_name: jcx-${GLIBC_VERSION}-r${REVISION}
+          release_name: jcx-${GLIBC_VERSION}-r${REVISION}
           body: |
             Changes in this Release
             - First Change
@@ -56,7 +56,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./artifacts/x86_64.tar.gz
-          asset_name: glibc-bin-$GLIBC_VERSION-$REVISION-x86_64.tar.gz
+          asset_name: glibc-bin-${GLIBC_VERSION}-r${REVISION}-x86_64.tar.gz
           asset_content_type: application/gzip
       # Artifact Upload #2 - aarch64
       -
@@ -67,7 +67,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./artifacts/aarch64.tar.gz
-          asset_name: glibc-bin-$GLIBC_VERSION-$REVISION-aarch64.tar.gz
+          asset_name: glibc-bin-${GLIBC_VERSION}-r${REVISION}-aarch64.tar.gz
           asset_content_type: application/gzip
       # Artifact Upload #3 - arm
       -
@@ -78,7 +78,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./artifacts/arm.tar.gz
-          asset_name: glibc-bin-$GLIBC_VERSION-$REVISION-arm.tar.gz
+          asset_name: glibc-bin-${GLIBC_VERSION}-r${REVISION}-arm.tar.gz
           asset_content_type: application/gzip
       # Artifact Upload #4 - armhf
       -
@@ -89,5 +89,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./artifacts/armhf.tar.gz
-          asset_name: glibc-bin-$GLIBC_VERSION-$REVISION-armhf.tar.gz
+          asset_name: glibc-bin-${GLIBC_VERSION}-r${REVISION}-armhf.tar.gz
           asset_content_type: application/gzip
