@@ -1,0 +1,39 @@
+name: builder
+
+on:
+  push:
+    branches: jcx/master
+
+jobs:
+  builder:
+    runs-on: ubuntu-latest
+    env:
+      GLIBC_VERSION: 2.31
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v1
+      - 
+        name: Create builder image
+        run: docker build -t glibc-builder .
+      -
+        name: Setup for artifact results.
+        run: mkdir -p artifacts
+      -
+        name: Build glibc (x86_64-linux)
+        run: docker run --rm --env STDOUT=1 glibc-builder $GLIBC_VERSION /usr/glibc-compat x86_64-linux > artifacts/glibc-bin-$GLIBC_VERSION-x86_64-armel.tar.gz
+      -
+        name: Build glibc (aarch64-linux-gnu)
+        run: docker run --rm --env STDOUT=1 glibc-builder 2.31 /usr/glibc-compat aarch64-linux-gnu > artifacts/glibc-bin-$GLIBC_VERSION-aarch64.tar.gz
+      -
+        name: Build glibc (arm-linux-gnueabi)
+        run: docker run --rm --env STDOUT=1 glibc-builder 2.31 /usr/glibc-compat arm-linux-gnueabi > artifacts/glibc-bin-$GLIBC_VERSION-arm.tar.gz
+      -
+        name: Build glibc (arm-linux-gnueabihf)
+        run: docker run --rm --env STDOUT=1 glibc-builder 2.31 /usr/glibc-compat arm-linux-gnueabihf > artifacts/glibc-bin-$GLIBC_VERSION-armhf.tar.gz
+      - 
+        uses: eine/tip@master
+        with:
+          tag: jcx-${{ github.ref }}-$GLIBC_VERSION
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: artifacts/*
