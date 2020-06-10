@@ -9,31 +9,85 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GLIBC_VERSION: 2.31
+      REVISION: 0
     steps:
       -
         name: Checkout
         uses: actions/checkout@v1
       - 
-        name: Create builder image
-        run: docker build -t glibc-builder .
-      -
-        name: Setup for artifact results.
-        run: mkdir -p artifacts
+        name: Create builder image, artifact folder
+        run: mkdir -p artifacts && docker build -t glibc-builder .
       -
         name: Build glibc (x86_64-linux)
-        run: docker run --rm --env STDOUT=1 glibc-builder $GLIBC_VERSION /usr/glibc-compat x86_64-linux > artifacts/glibc-bin-$GLIBC_VERSION-x86_64-armel.tar.gz
+        run: docker run --rm --env STDOUT=1 glibc-builder $GLIBC_VERSION /usr/glibc-compat x86_64-linux > artifacts/x86_64.tar.gz
       -
         name: Build glibc (aarch64-linux-gnu)
-        run: docker run --rm --env STDOUT=1 glibc-builder 2.31 /usr/glibc-compat aarch64-linux-gnu > artifacts/glibc-bin-$GLIBC_VERSION-aarch64.tar.gz
+        run: docker run --rm --env STDOUT=1 glibc-builder 2.31 /usr/glibc-compat aarch64-linux-gnu > artifacts/aarch64.tar.gz
       -
         name: Build glibc (arm-linux-gnueabi)
-        run: docker run --rm --env STDOUT=1 glibc-builder 2.31 /usr/glibc-compat arm-linux-gnueabi > artifacts/glibc-bin-$GLIBC_VERSION-arm.tar.gz
+        run: docker run --rm --env STDOUT=1 glibc-builder 2.31 /usr/glibc-compat arm-linux-gnueabi > artifacts/arm.tar.gz
       -
         name: Build glibc (arm-linux-gnueabihf)
-        run: docker run --rm --env STDOUT=1 glibc-builder 2.31 /usr/glibc-compat arm-linux-gnueabihf > artifacts/glibc-bin-$GLIBC_VERSION-armhf.tar.gz
-      - 
-        uses: eine/tip@master
+        run: docker run --rm --env STDOUT=1 glibc-builder 2.31 /usr/glibc-compat arm-linux-gnueabihf > artifacts/armhf.tar.gz
+      # -------------------------
+      # Release creation, artifact uploading...
+      # -------------------------
+      -
+        name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag: jcx-${{ github.ref }}-$GLIBC_VERSION
-          token: ${{ secrets.GITHUB_TOKEN }}
-          files: artifacts/*
+          tag_name: jcx-$GLIBC_VERSION-$REVISION
+          release_name: jcx-$GLIBC_VERSION-$REVISION
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: false
+          prerelease: false
+      # Artifact Upload #1 - x86_64
+      - 
+        name: Upload Artifact: x86_64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/x86_64.tar.gz
+          asset_name: glibc-bin-$GLIBC_VERSION-$REVISION-x86_64.tar.gz
+          asset_content_type: application/gzip
+      # Artifact Upload #2 - aarch64
+      - 
+        name: Upload Artifact: aarch64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/aarch64.tar.gz
+          asset_name: glibc-bin-$GLIBC_VERSION-$REVISION-aarch64.tar.gz
+          asset_content_type: application/gzip
+      # Artifact Upload #3 - arm
+      - 
+        name: Upload Artifact: arm
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/arm.tar.gz
+          asset_name: glibc-bin-$GLIBC_VERSION-$REVISION-arm.tar.gz
+          asset_content_type: application/gzip
+      # Artifact Upload #4 - armhf
+      - 
+        name: Upload Artifact: armhf
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/armhf.tar.gz
+          asset_name: glibc-bin-$GLIBC_VERSION-$REVISION-armhf.tar.gz
+          asset_content_type: application/gzip
