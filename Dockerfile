@@ -1,7 +1,10 @@
 FROM ubuntu:19.04
 MAINTAINER Sasha Gerrand <github+docker-glibc-builder@sgerrand.com>
+
 ENV PREFIX_DIR /usr/glibc-compat
 ENV GLIBC_VERSION 2.31
+ENV ARCH x86_64-linux
+
 RUN apt-get -q update \
 	&& apt-get -qy install \
 		bison \
@@ -11,7 +14,9 @@ RUN apt-get -q update \
 		openssl \
 		python3 \
 		texinfo \
-		wget
+		wget \
+		gcc-aarch64-linux-gnu \
+		gcc-arm-linux-gnu
 COPY configparams /glibc-build/configparams
 COPY builder /builder
 ENTRYPOINT ["/builder"]
