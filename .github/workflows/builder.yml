@@ -41,10 +41,7 @@ jobs:
         with:
           tag_name: "jcx-${{env.GLIBC_VERSION}}-r${{env.REVISION}}"
           release_name: "jcx-${{env.GLIBC_VERSION}}-r${{env.REVISION}}"
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
+          body: "glibc ${{env.GLIBC_VERSION}}"
           draft: false
           prerelease: false
       # Artifact Upload #1 - x86_64
