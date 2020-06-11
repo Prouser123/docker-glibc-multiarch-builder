@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GLIBC_VERSION: 2.31
-      REVISION: 0
+      REVISION: 1
     steps:
       -
         name: Checkout
@@ -29,6 +29,12 @@ jobs:
       -
         name: Build glibc (arm-linux-gnueabihf)
         run: docker run --rm --env STDOUT=1 glibc-builder 2.31 /usr/glibc-compat arm-linux-gnueabihf > artifacts/armhf.tar.gz
+      -
+        name: Build glibc (s390x-linux-gnu)
+        run: docker run --rm --env STDOUT=1 glibc-builder 2.31 /usr/glibc-compat s390x-linux-gnu > artifacts/s390x.tar.gz
+      -
+        name: Build glibc (powerpc64le-linux-gnu)
+        run: docker run --rm --env STDOUT=1 glibc-builder 2.31 /usr/glibc-compat powerpc64le-linux-gnu > artifacts/ppc64le.tar.gz
       # -------------------------
       # Release creation, artifact uploading...
       # -------------------------
@@ -87,4 +93,26 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./artifacts/armhf.tar.gz
           asset_name: "glibc-bin-${{env.GLIBC_VERSION}}-r${{env.REVISION}}-armhf.tar.gz"
+          asset_content_type: application/gzip
+      # Artifact Upload #5 - s390x
+      -
+        name: Upload Artifact - s390x
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/s390x.tar.gz
+          asset_name: "glibc-bin-${{env.GLIBC_VERSION}}-r${{env.REVISION}}-s390x.tar.gz"
+          asset_content_type: application/gzip
+      # Artifact Upload #6 - ppc64le
+      -
+        name: Upload Artifact - ppc64le
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/ppc64le.tar.gz
+          asset_name: "glibc-bin-${{env.GLIBC_VERSION}}-r${{env.REVISION}}-ppc64le.tar.gz"
           asset_content_type: application/gzip
