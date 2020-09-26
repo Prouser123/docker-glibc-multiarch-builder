@@ -28,8 +28,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 		# ppc64le (ppc64el) Linux
 		gcc-powerpc64le-linux-gnu g++-powerpc64le-linux-gnu \
 		# GIT
-		git \
-	&& wget https://patchwork.ozlabs.org/project/buildroot/patch/20170803213027.27565-1-thomas.petazzoni@free-electrons.com/raw/ -O /patch.diff
+		git
+COPY patches /patches
 COPY configparams /glibc-build/configparams
 COPY builder /builder
 ENTRYPOINT ["/builder"]

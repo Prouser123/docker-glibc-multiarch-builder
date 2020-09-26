@@ -11,7 +11,7 @@ main() {
 	{
 		wget -qO- "https://ftpmirror.gnu.org/libc/glibc-$version.tar.gz" \
 			| tar zxf -
-		git apply /patch.diff
+		git apply /patches/*.diff
 		mkdir -p /glibc-build && cd /glibc-build
 		"/glibc-$version/configure" \
 			--prefix="$prefix" \
