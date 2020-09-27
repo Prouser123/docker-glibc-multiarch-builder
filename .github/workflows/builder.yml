@@ -1,0 +1,115 @@
+# Prouser123/docker-glibc-multiarch-builder GitHub Action Script
+# Version 2.0.0_3
+
+name: builder
+
+on:
+  push:
+    branches: jcx/archive/2.27
+
+
+env:
+  GLIBC_VERSION: 2.27
+  REVISION: 0
+
+jobs:
+  # ---------------
+  # runner build stage:
+  # Creates the container image needed to build glibc.
+  # ---------------
+  runner:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v1
+      - 
+        name: Create builder image
+        run: docker build -t glibc-builder . && sudo su -c 'docker save glibc-builder > /glibc-builder.docker && chmod 777 /glibc-builder.docker'
+      -
+        name: Share docker image to other jobs
+        uses: actions/upload-artifact@v2
+        with:
+          name: glibc-builder
+          path: /glibc-builder.docker
+      # Release creation
+      -
+        name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "jcx-${{env.GLIBC_VERSION}}-r${{env.REVISION}}"
+          release_name: "jcx-${{env.GLIBC_VERSION}}-r${{env.REVISION}}"
+          body: "glibc ${{env.GLIBC_VERSION}}"
+          draft: false
+          prerelease: false
+      -
+        name: Save release URL to file
+        run: "echo '${{ steps.create_release.outputs.upload_url }}' > ~/release-url.txt"
+      -
+        name: Share release URL to other jobs
+        uses: actions/upload-artifact@v2
+        with:
+          name: release-url
+          path: ~/release-url.txt 
+  # ---------------
+  # platform build stage:
+  # Builds glibc for all named platforms in parallel.
+  # ---------------
+  platform:
+    needs: [runner]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: ["x86_64-linux", "aarch64-linux-gnu", "arm-linux-gnueabi", "arm-linux-gnueabihf", "s390x-linux-gnu", "powerpc64le-linux-gnu"]
+    steps:
+      # Download + import docker image + create artifacts dir
+      - 
+        name: Download docker image from runner job.
+        uses: actions/download-artifact@v2
+        with:
+          name: glibc-builder
+          path: ~/
+      -
+        name: Import docker image & create artifacts dir
+        run: "cat ~/glibc-builder.docker | docker load && mkdir -p artifacts"
+      # Build glibc
+      -
+        name: Build glibc (${{ matrix.platform }})
+        run: docker run --rm --env STDOUT=1 glibc-builder $GLIBC_VERSION /usr/glibc-compat ${{ matrix.platform }} > artifacts/${{ matrix.platform }}.tar.gz
+      # Download artifact URL
+      - name: Download artifact URL
+        uses: actions/download-artifact@v2
+        with:
+          name: release-url
+          path: ~/
+      - name: Set artifact URL to env variable
+        run: 'echo "::set-env name=ARTIFACT_URL::$(cat ~/release-url.txt)"'
+      # Artifact upload
+      -
+        name: Upload Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{env.ARTIFACT_URL}}
+          asset_path: ./artifacts/${{ matrix.platform }}.tar.gz
+          asset_name: "glibc-bin-${{env.GLIBC_VERSION}}-r${{env.REVISION}}-${{matrix.platform}}.tar.gz"
+          asset_content_type: application/gzip
+  # ---------------
+  # Cleanup stage:
+  # GitHub Actions artifacts only last 90 days anyways, and are no use to us once the job has passed.
+  # ---------------
+  cleanup:
+    needs: [platform]
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Delete build artifacts
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: |
+            glibc-builder
+            release-url
