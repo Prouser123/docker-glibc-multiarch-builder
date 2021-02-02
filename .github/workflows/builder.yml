@@ -86,7 +86,7 @@ jobs:
           name: release-url
           path: ~/
       - name: Set artifact URL to env variable
-        run: 'echo "::set-env name=ARTIFACT_URL::$(cat ~/release-url.txt)"'
+        run: 'echo "ARTIFACT_URL=$(cat ~/release-url.txt)" >> $GITHUB_ENV'
       # Artifact upload
       -
         name: Upload Artifact
