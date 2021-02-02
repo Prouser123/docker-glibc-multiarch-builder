@@ -2,7 +2,7 @@ FROM ubuntu:19.04
 MAINTAINER Sasha Gerrand <github+docker-glibc-builder@sgerrand.com>
 
 ENV PREFIX_DIR /usr/glibc-compat
-ENV GLIBC_VERSION 2.31
+ENV GLIBC_VERSION 2.32
 ENV ARCH x86_64-linux
 
 RUN export DEBIAN_FRONTEND=noninteractive \
