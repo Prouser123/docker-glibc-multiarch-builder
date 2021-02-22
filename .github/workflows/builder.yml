@@ -108,7 +108,8 @@ jobs:
         with:
           upload_url: ${{env.ARTIFACT_URL}}
           asset_path: ./artifacts/sha512.txt
-          asset_name: "glibc-bin-${{env.GLIBC_VERSION}}-r${{env.REVISION}}-${{matrix.platform}}.tar.gz.sha512.txt"
+          asset_name: "glibc-bin-${{env.GLIBC_VERSION}}-r${{env.REVISION}}-${{matrix.platform}}.tar.gz.sha512"
+          asset_content_type: text/plain
       # Create a SHA256 of the artifact and upload it
       - name: Create SHA256 of artifact
         run: $(cd artifacts && sha256sum ${{ matrix.platform }}.tar.gz > sha256.txt)
@@ -119,7 +120,8 @@ jobs:
         with:
           upload_url: ${{env.ARTIFACT_URL}}
           asset_path: ./artifacts/sha256.txt
-          asset_name: "glibc-bin-${{env.GLIBC_VERSION}}-r${{env.REVISION}}-${{matrix.platform}}.tar.gz.sha256.txt"
+          asset_name: "glibc-bin-${{env.GLIBC_VERSION}}-r${{env.REVISION}}-${{matrix.platform}}.tar.gz.sha256"
+          asset_content_type: text/plain
   # ---------------
   # Cleanup stage:
   # GitHub Actions artifacts only last 90 days anyways, and are no use to us once the job has passed.
