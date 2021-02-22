@@ -17,6 +17,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 		python3 \
 		texinfo \
 		wget \
+		# i686 (i386) Linux
+		gcc-i686-linux-gnu g++-i686-linux-gnu \
 		# arm64v8 Linux
 		gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
 		# armel (armv4t) Linux
@@ -25,6 +27,10 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 		gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf \
 		# s390x Linux
 		gcc-s390x-linux-gnu g++-s390x-linux-gnu \
+		# powerpc (ppc) Linux
+		gcc-powerpc-linux-gnu g++-powerpc-linux-gnu \
+		# powerpc64 (ppc64) Linux
+		gcc-powerpc64-linux-gnu g++-powerpc64-linux-gnu \
 		# ppc64le (ppc64el) Linux
 		gcc-powerpc64le-linux-gnu g++-powerpc64le-linux-gnu \
 		# GIT

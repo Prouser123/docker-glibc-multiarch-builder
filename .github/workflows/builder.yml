@@ -10,7 +10,7 @@ on:
 
 env:
   GLIBC_VERSION: 2.32
-  REVISION: 0
+  REVISION: 1
 
 jobs:
   # ---------------
@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        platform: ["x86_64-linux", "aarch64-linux-gnu", "arm-linux-gnueabi", "arm-linux-gnueabihf", "s390x-linux-gnu", "powerpc64le-linux-gnu"]
+        platform: ["x86_64-linux", "i686-linux-gnu", "aarch64-linux-gnu", "arm-linux-gnueabi", "arm-linux-gnueabihf", "s390x-linux-gnu", "powerpc-linux-gnu", "powerpc64-linux-gnu", "powerpc64le-linux-gnu"]
     steps:
       # Download + import docker image + create artifacts dir
       - 
