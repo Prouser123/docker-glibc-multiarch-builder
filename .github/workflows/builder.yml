@@ -10,7 +10,7 @@ on:
 
 env:
   GLIBC_VERSION: 2.32
-  REVISION: 1
+  REVISION: 2
 
 jobs:
   # ---------------
@@ -98,6 +98,28 @@ jobs:
           asset_path: ./artifacts/${{ matrix.platform }}.tar.gz
           asset_name: "glibc-bin-${{env.GLIBC_VERSION}}-r${{env.REVISION}}-${{matrix.platform}}.tar.gz"
           asset_content_type: application/gzip
+      # Create a SHA512 of the artifact and upload it
+      - name: Create SHA512 of artifact
+        run: $(cd artifacts && sha512sum ${{ matrix.platform }}.tar.gz > sha512.txt)
+      - name: Upload SHA512 of Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{env.ARTIFACT_URL}}
+          asset_path: ./artifacts/sha512.txt
+          asset_name: "glibc-bin-${{env.GLIBC_VERSION}}-r${{env.REVISION}}-${{matrix.platform}}.tar.gz.sha512.txt"
+      # Create a SHA256 of the artifact and upload it
+      - name: Create SHA256 of artifact
+        run: $(cd artifacts && sha256sum ${{ matrix.platform }}.tar.gz > sha256.txt)
+      - name: Upload SHA256 of Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{env.ARTIFACT_URL}}
+          asset_path: ./artifacts/sha256.txt
+          asset_name: "glibc-bin-${{env.GLIBC_VERSION}}-r${{env.REVISION}}-${{matrix.platform}}.tar.gz.sha256.txt"
   # ---------------
   # Cleanup stage:
   # GitHub Actions artifacts only last 90 days anyways, and are no use to us once the job has passed.
